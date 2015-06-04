@@ -41,7 +41,7 @@ readonly WORKSPACE_DIR=${TASK_SCRATCH_DIR}/${SGE_TASK_ID}
 sudo mkdir -p ${WORKSPACE_DIR} -m 777
 
 # Set the log file
-export BIGTOOLS_LOG_FILE=${WORKSPACE_DIR}/compress.${SGE_TASK_ID}.log
+export BIGTOOLS_LOG_FILE=${WORKSPACE_DIR}/${JOB_NAME}.${JOB_ID}.${SGE_TASK_ID}.log
 
 # For debugging, emit the hostname and inputs
 bigtools_log::emit "Task host: $(hostname)"
