@@ -1,0 +1,2 @@
+gs://MY_BUCKET/simple_path/to_file.gz
+gs://MY_BUCKET/simple_path/to_many/*.gz
