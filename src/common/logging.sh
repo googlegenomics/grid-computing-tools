@@ -22,13 +22,11 @@
 #  * Call bigtools_log::log to write messages to the log
 #  * Call bigtools_log::emit to write to stdout and to the log
 
-declare BIGTOOLS_LOG_FILE=
-
 # bigtools_log::log
 #
 # The log function will echo the input parameters to the BIGTOOLS_LOG_FILE
 function bigtools_log::log() {
-  if [[ -n ${BIGTOOLS_LOG_FILE} ]]; then
+  if [[ -n ${BIGTOOLS_LOG_FILE:-} ]]; then
     echo "${@}" >> ${BIGTOOLS_LOG_FILE}
   fi
 }

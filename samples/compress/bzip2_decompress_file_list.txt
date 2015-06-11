@@ -1,2 +1,6 @@
-gs://MY_BUCKET/simple_path/to_file.bz2
-gs://MY_BUCKET/simple_path/to_many/*.bz2
+gs://genomics-public-data/ftp-trace.ncbi.nih.gov/1000genomes/ftp/phase3/data/HG02291/cg_data/ASM_blood/vcfBeta-GS000017105-ASM.vcf.bz2
+gs://genomics-public-data/ftp-trace.ncbi.nih.gov/1000genomes/ftp/phase3/data/HG01974/cg_data/ASM_blood/vcfBeta-GS000017158-ASM.vcf.bz2
+gs://genomics-public-data/ftp-trace.ncbi.nih.gov/1000genomes/ftp/phase3/data/HG00621/cg_data/ASM_lcl/vcfBeta-GS000017116-ASM.vcf.bz2
+gs://genomics-public-data/ftp-trace.ncbi.nih.gov/1000genomes/ftp/phase3/data/HG00625/cg_data/ASM_lcl/vcfBeta-GS000017120-ASM.vcf.bz2
+gs://genomics-public-data/ftp-trace.ncbi.nih.gov/1000genomes/ftp/phase3/data/NA12801/cg_data/ASM_lcl/vcfBeta-GS000016407-ASM.vcf.bz2
+gs://genomics-public-data/ftp-trace.ncbi.nih.gov/1000genomes/ftp/phase3/data/NA12752/cg_data/ASM_lcl/vcfBeta-GS000016413-ASM.vcf.bz2

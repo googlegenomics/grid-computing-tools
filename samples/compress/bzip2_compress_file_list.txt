@@ -1,2 +1,6 @@
-gs://MY_BUCKET/simple_path/to_file.txt
-gs://MY_BUCKET/simple_path/to_many/*
+gs://genomics-public-data/platinum-genomes/vcf/NA12877_S1.genome.vcf
+gs://genomics-public-data/platinum-genomes/vcf/NA12878_S1.genome.vcf
+gs://genomics-public-data/platinum-genomes/vcf/NA12879_S1.genome.vcf
+gs://genomics-public-data/platinum-genomes/vcf/NA12880_S1.genome.vcf
+gs://genomics-public-data/platinum-genomes/vcf/NA12881_S1.genome.vcf
+gs://genomics-public-data/platinum-genomes/vcf/NA12882_S1.genome.vcf

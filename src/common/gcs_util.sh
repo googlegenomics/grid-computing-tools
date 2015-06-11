@@ -109,13 +109,11 @@ readonly -f gcs_util::upload_log
 # gcs_util::get_file_list
 #
 # Returns a list of matching objects at the specified remote path.
-# This is largely syntactic sugar around "gsutil ls".
-# Does NOT respect the DRYRUN environment variable as the intent of
+# This is strictly syntactic sugar around "gsutil ls".
+# It does NOT respect the DRYRUN environment variable as the intent of
 # this function is to be used specifically when DRYRUN is enabled (1).
 function gcs_util::get_file_list() {
   local remote_path=${1}
-
-  bigtools_log::emit "List: ${remote_path}"
 
   gsutil ls ${remote_path}
 }

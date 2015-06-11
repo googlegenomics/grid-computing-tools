@@ -37,7 +37,7 @@ source ${SRC_ROOT}/common/gcs_util.sh
 trap exit_clean EXIT
 
 # Set the workspace dir
-readonly WORKSPACE_DIR=${TASK_SCRATCH_DIR}/${SGE_TASK_ID}
+readonly WORKSPACE_DIR=${TASK_SCRATCH_DIR}/${JOB_NAME}.${JOB_ID}.${SGE_TASK_ID}
 sudo mkdir -p ${WORKSPACE_DIR} -m 777
 
 # Set the log file
@@ -74,10 +74,6 @@ bigtools_log::emit "Processing ${INPUT_PATTERN}"
 
 # Launch the job
 for ((i = 0; i < ${TASK_MAX_ATTEMPTS}; i++)); do
-  # Set up the workspace dir
-  sudo rm -rf ${WORKSPACE_DIR}
-  sudo mkdir -p ${WORKSPACE_DIR} --mode 777
-
   # Access to GCS can hang at times; just whack the job and try again
   if timeout ${TASK_TIMEOUT} \
       ${SRC_ROOT}/compress/do_compress.sh \

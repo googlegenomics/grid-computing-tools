@@ -49,21 +49,11 @@ declare -a FILE_LIST
 if [[ ${DRYRUN:-} -eq 1 ]]; then
   # The FILE_LIST will be empty for a DRYRUN; try to fake it
   DRYRUN_LIST=$(gcs_util::get_file_list "${INPUT_PATH}")
-  FILE_LIST=($(echo ${DRYRUN_LIST} | sed -e 's#.*/##'))
+  FILE_LIST=($(echo "${DRYRUN_LIST}" | sed -e 's#.*/##'))
 else
   FILE_LIST=($(/bin/ls -1 ${WS_IN_DIR}))
 fi
 readonly FILE_LIST
-
-function expand_command() {
-  local cmd=${1}
-  local input=${2}
-  local output=${3}
-
-  echo "${cmd}" | \
-    sed -e 's#{input}#'"${input}"'#' \
-        -e 's#{output}#'"${output}"'#'
-}
 
 # Process the input files
 START=$(date +%s)
