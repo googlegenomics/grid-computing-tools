@@ -4,5 +4,3 @@ gs://genomics-public-data/ftp-trace.ncbi.nih.gov/1000genomes/ftp/technical/worki
 gs://genomics-public-data/ftp-trace.ncbi.nih.gov/1000genomes/ftp/release/20130502/supporting/input_callsets/um/ALL.chr22.got_cloud.20130502.indels.integrated.sites.vcf.gz
 gs://genomics-public-data/ftp-trace.ncbi.nih.gov/1000genomes/ftp/technical/working/20110721_exome_call_sets/bcm/ALL.BCM_Illumina_Mosaik_ontarget_plus50bp_822.20110521.snp.exome.genotypes.vcf.gz
 gs://genomics-public-data/ftp-trace.ncbi.nih.gov/1000genomes/ftp/release/20130502/supporting/input_callsets/bi/ALL.chr16.broad.mapping.20130502.snps_indels.low_coverage.sites.vcf.gz
-
-
