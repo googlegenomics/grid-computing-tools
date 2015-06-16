@@ -2,6 +2,8 @@
 .. _bzip2: http://www.bzip.org/
 .. _Google Compute Engine: https://cloud.google.com/compute/
 .. _Grid Engine: http://gridengine.info/
+.. _gsutil: https://cloud.google.com/storage/docs/gsutil
+.. _crcmod python module: https://cloud.google.com/storage/docs/gsutil/addlhelp/CRC32CandInstallingcrcmod
 
 =================================================
 Compress/Decompress files in Google Cloud Storage
@@ -43,12 +45,12 @@ single file, (de)compress it, and upload it back to Cloud Storage.
 Running the samples
 -------------------
 The quickest way to get familiar with the ``compress`` BigTool is by trying one or more
-of the samples. Samples are provided for:
+of the samples. Samples are provided for the following uses:
 
-* Pull bzip2-compressed files from Cloud Storage, decompress them, and copy the results into Cloud Storage
-* Pull decompressed files from Cloud Storage, compress them with bzip2, and copy the results into Cloud Storage
-* Pull gzip-compressed files from Cloud Storage, decompress them, and copy the results into Cloud Storage
-* Pull decompressed files from Cloud Storage, compress them with gzip, and copy the results into Cloud Storage
+* Download bzip2-compressed files from Cloud Storage, decompress them, and upload the results into Cloud Storage
+* Download decompressed files from Cloud Storage, compress them with bzip2, and upload the results into Cloud Storage
+* Download gzip-compressed files from Cloud Storage, decompress them, and upload the results into Cloud Storage
+* Download decompressed files from Cloud Storage, compress them with gzip, and upload the results into Cloud Storage
 
 The samples provided here each list just 6 files to work on, and the instructions below demonstrate
 spreading the processing over 3 worker instances.
@@ -59,7 +61,25 @@ Follow the instructions
 `here <http://googlegenomics.readthedocs.org/en/staging-2/includes/elasticluster_setup.html>`_
 to configure a Grid Engine cluster using Elasticluster.
 
-2. Upload the `src` and `samples` directories to the Grid Engine master instance:
+*** TODO: clarify where the elasticluster and bigtools repositories need to be downloaded to
+and that the elasticluster virtualenv is assumed to be active
+
+2. Install crcmod on each ``compute`` node
+
+For `gsutil`_ to download and verify multi-component objects, the `crcmod python module`_ must be installed
+on each of the ``compute`` nodes.
+
+The ``bigtools`` repository contains a utility script which can be used to do just that:
+
+.. code-block:: shell
+
+  ./bin/install_crcmod.sh gridengine
+
+The script uses the Elasticluster Python API to list the nodes in the ``gridengine`` cluster
+and then ``elasticluster ssh gridengine -n <node>`` to connect to each node in the cluster and
+issue the necessary ``crcmod`` install commands.
+
+3. Upload the `src` and `samples` directories to the Grid Engine master instance:
 
 .. code-block:: shell
 
@@ -72,17 +92,113 @@ to configure a Grid Engine cluster using Elasticluster.
   
 (You can also use `gcloud compute copy-files` if you know the instance name of master instance.)
 
-3. SSH to the master instance
+4. SSH to the master instance
  
 .. code-block:: shell
 
   elasticluster ssh gridengine
   
-4. Run the sample
+5. Set up the configuration files for the samples
+
+The syntax for running each of the samples is the same:
+
+.. code-block:: shell
+
+  ./src/compress/launch_compress.sh [config_file]
+
+The ``config_file`` lists two sets of key parameters:
+
+* What operation to perform
+* What are the source and destination locations
+
+The operation to perform is controlled by the following:
+
+.. code-block:: shell
+
+* COMPRESS_OPERATION: ``compress`` or ``decompress``
+* COMPRESS_TYPE: ``bzip2`` or ``gzip``
+* COMPRESS_EXTENSION: Typically ``.bz2`` or ``.gz``
+
+The locations are determined by:
+
+* INPUT_LIST_FILE: file containing a list of GCS paths to the input files to process
+* OUTPUT_PATH: GCS path indicating where to upload the output files
+* OUTPUT_LOG_PATH: (optional) GCS path indicating where to upload log files
+
+To use the samples, you must update the ``OUTPUT_PATH`` and ``OUTPUT_LOG_PATH`` to
+contain a valid GCS bucket name. Each of the sample config files sets a placeholder
+for the ``OUTPUT_PATH`` and ``OUTPUT_LOG_PATH`` such as:
+
+.. code-block:: shell
+
+  export OUTPUT_PATH=gs://MY_BUCKET/output_path/bzip2
+  export OUTPUT_LOG_PATH=gs://MY_BUCKET/log_path/bzip2
+
+You can do this manually with the editor of your choice or you can change all of the
+``config`` files at once with the command:
+
+.. code-block:: shell
+
+  sed --in-place -e 's#MY_BUCKET#your_bucket#' samples/compress/*_config.sh
+
+Where ``your_bucket`` should be replaced with the name of a GCS bucket in your
+Cloud project to which you have write access.
+
+6. Run the sample:
+
+You can run all of the samples, or the just those that model your particular use-case.
+
+* Compress a list of files using bzip2
 
 .. code-block:: shell
 
   ./src/compress/launch_compress.sh ./samples/compress/bzip2_compress_config.sh
+
+* Decompress a list of files using bzip2
+
+.. code-block:: shell
+
+  ./src/compress/launch_compress.sh ./samples/compress/bzip2_decompress_config.sh
+
+* Compress a list of files using gzip
+
+.. code-block:: shell
+
+  ./src/compress/launch_compress.sh ./samples/compress/gzip_compress_config.sh
+
+* Decompress a list of files using gzip
+
+.. code-block:: shell
+
+  ./src/compress/launch_compress.sh ./samples/compress/gzip_decompress_config.sh
+
+When successfully launched, Grid Engine should emit a message such as:
+
+Your job-array 1.1-6:1 ("compress") has been submitted
+
+7. Monitoring the status of your job
+
+.. code-block:: shell
+
+  $ qstat
+  job-ID  prior   name       user         state submit/start at     queue                          slots ja-task-ID 
+  -----------------------------------------------------------------------------------------------------------------
+  11      0.00000 compress   mbookman     qw    06/16/2015 18:03:32                                    1 1-6:1
+
+
+
+8. Checking the output of tasks
+
+9. Viewing the results of the jobs
+
+10. Viewing log files
+
+
+
+
+
+
+
 
 
 
