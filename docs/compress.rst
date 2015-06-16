@@ -286,5 +286,66 @@ Where the ``OUTPUT_LOG_PATH`` should be the value you specified in the job confi
     sed -n -e 's#^Task time.*: \([0-9]*\) seconds#\1#p' | \
     awk '{ sum += $1; } END { print sum/NR }'
 
+12. Destroying the cluster
 
+When you are finished running the samples, disconnect from the master instance and
+from your workstation shut down the gridengine cluster:
 
+.. code-block:: shell
+
+  elasticluster stop gridengine
+
+--------------------
+Running your own job
+--------------------
+To run your own job to compress/decompress a list of files requires the following:
+
+#. Create an ``input list file``
+#. Create a ``job config file``
+#. Create a gridengine cluster with sufficient disk space attached to each ``compute`` node
+#. Upload input list and config files to the gridengine cluster master
+#. Launch the job
+
+The following instructions provide guidance on each of these steps.
+It is recommended, though not a requirement, that you save your ``input list file`` and ``job config file``
+to a directory outside the ``bigtools`` directory. For example, you might create a directory
+``$BIGTOOLS_ROOT/my_jobs``.
+
+1. Create an ``input list file``
+
+If all of your input files appear in a single directory, then the easiest way to generate a file list
+is with ``gsutil``. For example:
+
+.. code-block:: shell
+
+  gsutil ls gs://MY_BUCKET/PATH/*.vcf.bz2 > $BIGTOOLS_ROOT/my_jobs/compressed_vcf_list_file.txt
+  
+2. Create a ``job config file``  
+
+The easiest way to create a job config file is to base it off the appropriate sample and update
+
+* INPUT_LIST_FILE
+* OUTPUT_PATH
+* OUTPUT_LOG_PATH
+
+3. Create a gridengine cluster with sufficient disk space attached to each ``compute`` node
+
+Each ``compute`` node will require sufficient disk space to hold the compressed and decompressed
+version of the file being processed for its current task. Determine the largest file in your input list
+and estimate the total space you will need. If the file is already compressed, you may need to download
+the file and decompress it.
+
+Instructions for setting the boot disk size for the compute nodes of your cluster can be found
+`here <http://googlegenomics.readthedocs.org/en/staging-2/includes/elasticluster_setup.html#setting-the-boot-disk-size>`_.
+
+Create the cluster.
+
+4. Upload input list and config files to the gridengine cluster master
+
+.. code-block:: shell
+
+  elasticluster sftp gridengine << EOF
+  put $BIGTOOLS_ROOT/*
+  EOF
+
+5. Launch the job
