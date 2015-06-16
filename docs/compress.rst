@@ -2,6 +2,7 @@
 .. _bzip2: http://www.bzip.org/
 .. _Google Compute Engine: https://cloud.google.com/compute/
 .. _Grid Engine: http://gridengine.info/
+.. _Elasticluster: https://elasticluster.readthedocs.org
 .. _gsutil: https://cloud.google.com/storage/docs/gsutil
 .. _crcmod python module: https://cloud.google.com/storage/docs/gsutil/addlhelp/CRC32CandInstallingcrcmod
 
@@ -42,6 +43,15 @@ all of the instances such that each instance takes the responsibility to downloa
 single file, (de)compress it, and upload it back to Cloud Storage.
 
 -------------------
+Directory structure
+-------------------
+To use the ``compress`` sample, you will need to download both the ``bigtools`` repository
+and the repository for `Elasticluster`_ to your local workstation or laptop. No specific
+relationship exists between these two repositories. But in the following instructions, it is
+assumed that the ``bigtools`` and ``elasticluster`` directories are siblings under a
+``BIGTOOLS_ROOT`` directory.
+
+-------------------
 Running the samples
 -------------------
 The quickest way to get familiar with the ``compress`` BigTool is by trying one or more
@@ -57,29 +67,41 @@ spreading the processing over 3 worker instances.
 
 1. Create a cluster of Compute Engine instances with Grid Engine installed and configured
 
-Follow the instructions
+In your current shell, set your directory to your selected ``BIGTOOLS_ROOT`` and then
+follow the instructions
 `here <http://googlegenomics.readthedocs.org/en/staging-2/includes/elasticluster_setup.html>`_
 to configure a Grid Engine cluster using Elasticluster.
 
-*** TODO: clarify where the elasticluster and bigtools repositories need to be downloaded to
-and that the elasticluster virtualenv is assumed to be active
+2. Download the ``bigtools`` repository (if you have not already done so)
 
-2. Install crcmod on each ``compute`` node
+   a. cd $BIGTOOLS_ROOT
+   b. git clone https://github.com/googlegenomics/bigtools.git
+   c. cd bigtools
+
+3. Install crcmod on each ``compute`` node
 
 For `gsutil`_ to download and verify multi-component objects, the `crcmod python module`_ must be installed
 on each of the ``compute`` nodes.
 
-The ``bigtools`` repository contains a utility script which can be used to do just that:
+The ``bigtools`` repository contains a utility script which can be used to do this.
+The script uses the Elasticluster Python API to list the nodes in the ``gridengine`` cluster
+and then ``elasticluster ssh gridengine -n <node>`` to connect to each node in the cluster and
+issue the necessary ``crcmod`` install commands.
+
+Running this script requires that ``elasticluster`` be in your ``PATH``. This will be true if your
+``elasticluster`` virtualenv is active. Otherwise you can set the ``PATH`` explicitly:
+
+.. code-block:: shell
+
+  export PATH=${PATH}:${BIGTOOLS_ROOT}/elasticluster/bin
+
+To run the ``install_crcmod.sh`` script:
 
 .. code-block:: shell
 
   ./bin/install_crcmod.sh gridengine
 
-The script uses the Elasticluster Python API to list the nodes in the ``gridengine`` cluster
-and then ``elasticluster ssh gridengine -n <node>`` to connect to each node in the cluster and
-issue the necessary ``crcmod`` install commands.
-
-3. Upload the `src` and `samples` directories to the Grid Engine master instance:
+4. Upload the `src` and `samples` directories to the Grid Engine master instance:
 
 .. code-block:: shell
 
@@ -89,16 +111,14 @@ issue the necessary ``crcmod`` install commands.
   mkdir samples
   put -r samples
   EOF
-  
-(You can also use `gcloud compute copy-files` if you know the instance name of master instance.)
 
-4. SSH to the master instance
+5. SSH to the master instance
  
 .. code-block:: shell
 
   elasticluster ssh gridengine
   
-5. Set up the configuration files for the samples
+6. Set up the configuration files for the samples
 
 The syntax for running each of the samples is the same:
 
@@ -144,7 +164,7 @@ You can do this manually with the editor of your choice or you can change all of
 Where ``your_bucket`` should be replaced with the name of a GCS bucket in your
 Cloud project to which you have write access.
 
-6. Run the sample:
+7. Run the sample:
 
 You can run all of the samples, or the just those that model your particular use-case.
 
@@ -176,7 +196,7 @@ When successfully launched, Grid Engine should emit a message such as:
 
 Your job-array 1.1-6:1 ("compress") has been submitted
 
-7. Monitoring the status of your job
+8. Monitoring the status of your job
 
 .. code-block:: shell
 
@@ -187,11 +207,11 @@ Your job-array 1.1-6:1 ("compress") has been submitted
 
 
 
-8. Checking the output of tasks
+9. Checking the output of tasks
 
-9. Viewing the results of the jobs
+10. Viewing the results of the jobs
 
-10. Viewing log files
+11. Viewing log files
 
 
 
