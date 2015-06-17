@@ -303,7 +303,7 @@ To run your own job to compress/decompress a list of files requires the followin
 #. Create an ``input list file``
 #. Create a ``job config file``
 #. Create a gridengine cluster with sufficient disk space attached to each ``compute`` node
-#. Upload input list and config files to the gridengine cluster master
+#. Upload input list file, config file, and `bigtools` source to the gridengine cluster master
 #. Launch the job
 
 The following instructions provide guidance on each of these steps.
@@ -338,14 +338,44 @@ the file and decompress it.
 Instructions for setting the boot disk size for the compute nodes of your cluster can be found
 `here <http://googlegenomics.readthedocs.org/en/staging-2/includes/elasticluster_setup.html#setting-the-boot-disk-size>`_.
 
-Create the cluster.
+You will likely want to set the number of ``compute`` nodes for your cluster to a number higher than the
+**3** specified in the cluster setup instructions.
 
-4. Upload input list and config files to the gridengine cluster master
+Note that your choice for number of nodes and disk size must take into account your resource quota for
+the Compute Engine region of your cluster.
+
+Quota limits and current usage can be viewed with ``gcloud compute``:
+
+  gcloud compute regions describe *region*
+
+or in ``Developers Console``:
+
+  https://console.developers.google.com/project/_/compute/quotas
+
+Important quota limits include CPUs, in-use IP addresses, and disk size.
+
+Once configured, start your cluster.
+
+4. Upload input list file, config file, and `bigtools` source to the gridengine cluster master
 
 .. code-block:: shell
 
   elasticluster sftp gridengine << EOF
-  put $BIGTOOLS_ROOT/*
+  put ../my_jobs/*
+  mkdir src
+  put -r src
   EOF
 
 5. Launch the job
+
+SSH to the master instance
+ 
+.. code-block:: shell
+
+  elasticluster ssh gridengine
+
+Run the launch script, passing in the config file:
+
+  ./src/compress/launch_compress.sh my_job_config.sh
+  
+where *my_job_config.sh* is replaced by the name of your config file created in step 2.
