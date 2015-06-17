@@ -42,6 +42,7 @@ sudo mkdir -p ${WORKSPACE_DIR} -m 777
 
 # Set the log file
 export BIGTOOLS_LOG_FILE=${WORKSPACE_DIR}/${JOB_NAME}.${JOB_ID}.${SGE_TASK_ID}.log
+readonly TASK_START_TIME=$(date '+%s')
 
 # For debugging, emit the hostname and inputs
 bigtools_log::emit "Task host: $(hostname)"
@@ -63,6 +64,10 @@ readonly -f exit_clean
 function finish() {
   # Upload the log file
   if [[ -n ${OUTPUT_LOG_PATH:-} ]]; then
+    local start=${TASK_START_TIME}
+    local end=$(date '+%s')
+
+    bigtools_log::emit "Task time ${SGE_TASK_ID}: $((end - start)) seconds"
     gcs_util::upload_log "${BIGTOOLS_LOG_FILE}" "${OUTPUT_LOG_PATH}/"
   fi
 }
