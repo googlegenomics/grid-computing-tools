@@ -73,6 +73,9 @@ function finish() {
 }
 readonly -f finish
 
+# Make sure that the crcmod library is installed
+gcs_util::install_crcmod
+
 # Grab the record to process
 readonly INPUT_PATTERN=$(sed -n "${SGE_TASK_ID}p" ${INPUT_LIST_FILE})
 bigtools_log::emit "Processing ${INPUT_PATTERN}"

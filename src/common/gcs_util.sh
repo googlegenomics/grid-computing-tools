@@ -14,6 +14,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# gcs_util::install_crcmod
+#
+# Installs the compiled crcmod library if it is not installed
+# See:
+#  https://cloud.google.com/storage/docs/gsutil/addlhelp/CRC32CandInstallingcrcmod
+function gcs_util::install_crcmod() {
+  local crcmod_installed=$(\
+    gsutil version -l | sed -n -e 's/^compiled crcmod: *//p')
+
+  bigtools_log::emit "Compiled crcmod installed: ${crcmod_installed}"
+  if [[ ${crcmod_installed} != "True" ]]; then
+    bigtools_log::emit "Installing compiled crcmod"
+    sudo apt-get update --yes
+    sudo apt-get install --yes gcc python-dev python-setuptools
+    sudo easy_install -U pip
+    sudo pip uninstall --yes crcmod || true
+    sudo pip install -U crcmod
+  fi
+}
+readonly -f gcs_util::install_crcmod
+
 # gcs_util::download
 #
 # Copies the matching objects at the specified remote path
