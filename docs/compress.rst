@@ -4,7 +4,6 @@
 .. _Grid Engine: http://gridengine.info/
 .. _Elasticluster: https://elasticluster.readthedocs.org
 .. _gsutil: https://cloud.google.com/storage/docs/gsutil
-.. _crcmod python module: https://cloud.google.com/storage/docs/gsutil/addlhelp/CRC32CandInstallingcrcmod
 .. _gridengine array job: http://wiki.gridengine.info/wiki/index.php/Simple-Job-Array-Howto
 
 =================================================
@@ -79,30 +78,7 @@ to configure a Grid Engine cluster using Elasticluster.
    b. git clone https://github.com/googlegenomics/bigtools.git
    c. cd bigtools
 
-3. Install crcmod on each ``compute`` node
-
-For `gsutil`_ to download and verify multi-component objects, the `crcmod python module`_ must be installed
-on each of the ``compute`` nodes.
-
-The ``bigtools`` repository contains a utility script which can be used to do this.
-The script uses the Elasticluster Python API to list the nodes in the ``gridengine`` cluster
-and then ``elasticluster ssh gridengine -n <node>`` to connect to each node in the cluster and
-issue the necessary ``crcmod`` install commands.
-
-Running this script requires that ``elasticluster`` be in your ``PATH``. This will be true if your
-``elasticluster`` virtualenv is active. Otherwise you can set the ``PATH`` explicitly:
-
-.. code-block:: shell
-
-  export PATH=${PATH}:${BIGTOOLS_ROOT}/elasticluster/bin
-
-To run the ``install_crcmod.sh`` script:
-
-.. code-block:: shell
-
-  ./bin/install_crcmod.sh gridengine
-
-4. Upload the `src` and `samples` directories to the Grid Engine master instance:
+3. Upload the `src` and `samples` directories to the Grid Engine master instance:
 
 .. code-block:: shell
 
@@ -113,13 +89,13 @@ To run the ``install_crcmod.sh`` script:
   put -r samples
   EOF
 
-5. SSH to the master instance
+4. SSH to the master instance
  
 .. code-block:: shell
 
   elasticluster ssh gridengine
   
-6. Set up the configuration files for the samples
+5. Set up the configuration files for the samples
 
 The syntax for running each of the samples is the same:
 
@@ -165,7 +141,7 @@ You can do this manually with the editor of your choice or you can change all of
 Where ``your_bucket`` should be replaced with the name of a GCS bucket in your
 Cloud project to which you have write access.
 
-7. Run the sample:
+6. Run the sample:
 
 You can run all of the samples, or the just those that model your particular use-case.
 
@@ -203,7 +179,7 @@ This message tells you that the submitted job is a `gridengine array job`_.
 The above message indicates that the job id is **1** and that the tasks are numbered **1** through **6**.
 The name of the job **compress** is also indicated.
 
-8. Monitoring the status of your job
+7. Monitoring the status of your job
 
 Grid Engine provides the ``qstat`` command to get the status of the execution queue.
 
@@ -235,7 +211,7 @@ which indicates tasks **1-3** are all in the ``r`` (running) state, while tasks 
 
 When all tasks have completed ``qstat`` will produce no output.
 
-9. Checking the logging output of tasks
+8. Checking the logging output of tasks
 
 Each gridengine task will write to an "output" file and an "error" file.
 These files will be located in the directory the job was launched from (the ``HOME`` directory).
@@ -245,7 +221,7 @@ The files will be named *job_name*.\ **o**\ *job_id*.\ *task_id* and
 The error file will contain any unexpected error output, but will also contain the download and upload
 logging output from ``gsutil``.
 
-10. Viewing the results of the jobs
+9. Viewing the results of the jobs
 
 When tasks complete, the result files are uploaded to GCS. You can view the list of output files
 with ``gsutil ls``, such as:
@@ -256,7 +232,7 @@ with ``gsutil ls``, such as:
 
 Where the ``OUTPUT_PATH`` should be the value you specified in the job config file (step 6 above).
 
-11. Viewing log files
+10. Viewing log files
 
 When tasks complete, the result log files are uploaded to GCS if ``OUTPUT_LOG_PATH`` was set
 in the job config file. The log files can be of value both to verify success/failure of all
@@ -286,7 +262,7 @@ Where the ``OUTPUT_LOG_PATH`` should be the value you specified in the job confi
     sed -n -e 's#^Task time.*: \([0-9]*\) seconds#\1#p' | \
     awk '{ sum += $1; } END { print sum/NR }'
 
-12. Destroying the cluster
+11. Destroying the cluster
 
 When you are finished running the samples, disconnect from the master instance and
 from your workstation shut down the gridengine cluster:
