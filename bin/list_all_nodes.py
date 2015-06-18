@@ -17,18 +17,19 @@
 # list_all_nodes.py
 #
 # Utility script that returns a list of elasticluster node names
-# for a cluster.
+# for a cluster. The "node type" can optionally be specified.
 
 import elasticluster
 
 import sys
 
 # Check usage
-if len(sys.argv) != 2:
-  print "Usage: {} [cluster]".format(sys.argv[0])
+if len(sys.argv) < 2 or len(sys.argv) > 3:
+  print "Usage: {} [cluster] <node_type>".format(sys.argv[0])
   sys.exit(1)
 
 cluster_name=sys.argv[1]
+node_type=sys.argv[2] if len(sys.argv) > 2 else None
 
 # Create the elasticluster configuration endpoint
 configurator = elasticluster.get_configurator()
@@ -38,5 +39,6 @@ cluster = configurator.load_cluster(cluster_name)
 
 # Emit the node names
 for node in cluster.get_all_nodes():
-  print node['name']
+  if not node_type or node['kind'] == node_type:
+    print node['name']
 

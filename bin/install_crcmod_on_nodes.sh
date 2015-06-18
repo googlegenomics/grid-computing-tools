@@ -19,6 +19,8 @@
 # Utility script that connects to each node of a cluster
 # and installs the python crcmod module required by gsutil
 # to download multi-component objects.
+# The "node type" can optionally be specified such that, for example,
+# the operation can be restricted to all "compute" nodes in the cluster.
 
 set -o errexit
 set -o nounset
