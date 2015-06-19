@@ -65,20 +65,20 @@ of the samples. Samples are provided for the following uses:
 The samples provided here each list just 6 files to work on, and the instructions below demonstrate
 spreading the processing over 3 worker instances.
 
-1. Create a cluster of Compute Engine instances with Grid Engine installed and configured
+1. **Create a cluster of Compute Engine instances with Grid Engine installed and configured**
 
 In your current shell, set your directory to your selected ``BIGTOOLS_ROOT`` and then
 follow the instructions
 `here <http://googlegenomics.readthedocs.org/en/staging-2/includes/elasticluster_setup.html>`_
 to configure a Grid Engine cluster using Elasticluster.
 
-2. Download the ``bigtools`` repository (if you have not already done so)
+2. **Download the** ``bigtools`` **repository (if you have not already done so)**
 
    a. cd $BIGTOOLS_ROOT
    b. git clone https://github.com/googlegenomics/bigtools.git
    c. cd bigtools
 
-3. Upload the `src` and `samples` directories to the Grid Engine master instance:
+3. **Upload the** `src` **and** `samples` **directories to the Grid Engine master instance:**
 
 .. code-block:: shell
 
@@ -89,13 +89,13 @@ to configure a Grid Engine cluster using Elasticluster.
   put -r samples
   EOF
 
-4. SSH to the master instance
+4. **SSH to the master instance**
  
 .. code-block:: shell
 
   elasticluster ssh gridengine
   
-5. Set up the configuration files for the samples
+5. **Set up the configuration files for the samples**
 
 The syntax for running each of the samples is the same:
 
@@ -141,7 +141,7 @@ You can do this manually with the editor of your choice or you can change all of
 Where ``your_bucket`` should be replaced with the name of a GCS bucket in your
 Cloud project to which you have write access.
 
-6. Run the sample:
+6. **Run the sample:**
 
 You can run all of the samples, or the just those that model your particular use-case.
 
@@ -179,7 +179,7 @@ This message tells you that the submitted job is a `gridengine array job`_.
 The above message indicates that the job id is **1** and that the tasks are numbered **1** through **6**.
 The name of the job **compress** is also indicated.
 
-7. Monitoring the status of your job
+7. **Monitoring the status of your job**
 
 Grid Engine provides the ``qstat`` command to get the status of the execution queue.
 
@@ -211,7 +211,7 @@ which indicates tasks **1-3** are all in the ``r`` (running) state, while tasks 
 
 When all tasks have completed ``qstat`` will produce no output.
 
-8. Checking the logging output of tasks
+8. **Checking the logging output of tasks**
 
 Each gridengine task will write to an "output" file and an "error" file.
 These files will be located in the directory the job was launched from (the ``HOME`` directory).
@@ -221,7 +221,7 @@ The files will be named *job_name*.\ **o**\ *job_id*.\ *task_id* and
 The error file will contain any unexpected error output, but will also contain the download and upload
 logging output from ``gsutil``.
 
-9. Viewing the results of the jobs
+9. **Viewing the results of the jobs**
 
 When tasks complete, the result files are uploaded to GCS. You can view the list of output files
 with ``gsutil ls``, such as:
@@ -232,7 +232,7 @@ with ``gsutil ls``, such as:
 
 Where the ``OUTPUT_PATH`` should be the value you specified in the job config file (step 6 above).
 
-10. Viewing log files
+10. **Viewing log files**
 
 When tasks complete, the result log files are uploaded to GCS if ``OUTPUT_LOG_PATH`` was set
 in the job config file. The log files can be of value both to verify success/failure of all
@@ -262,7 +262,7 @@ Where the ``OUTPUT_LOG_PATH`` should be the value you specified in the job confi
     sed -n -e 's#^Task time.*: \([0-9]*\) seconds#\1#p' | \
     awk '{ sum += $1; } END { print sum/NR }'
 
-11. Destroying the cluster
+11. **Destroying the cluster**
 
 When you are finished running the samples, disconnect from the master instance and
 from your workstation shut down the gridengine cluster:
@@ -287,7 +287,7 @@ It is recommended, though not a requirement, that you save your ``input list fil
 to a directory outside the ``bigtools`` directory. For example, you might create a directory
 ``$BIGTOOLS_ROOT/my_jobs``.
 
-1. Create an ``input list file``
+1. **Create an** ``input list file``
 
 If all of your input files appear in a single directory, then the easiest way to generate a file list
 is with ``gsutil``. For example:
@@ -296,7 +296,7 @@ is with ``gsutil``. For example:
 
   gsutil ls gs://MY_BUCKET/PATH/*.vcf.bz2 > $BIGTOOLS_ROOT/my_jobs/compressed_vcf_list_file.txt
   
-2. Create a ``job config file``  
+2. **Create a** ``job config file``
 
 The easiest way to create a job config file is to base it off the appropriate sample and update
 
@@ -304,7 +304,7 @@ The easiest way to create a job config file is to base it off the appropriate sa
 * OUTPUT_PATH
 * OUTPUT_LOG_PATH
 
-3. Create a gridengine cluster with sufficient disk space attached to each ``compute`` node
+3. **Create a gridengine cluster with sufficient disk space attached to each** ``compute`` **node**
 
 Each ``compute`` node will require sufficient disk space to hold the compressed and decompressed
 version of the file being processed for its current task. Determine the largest file in your input list
@@ -332,7 +332,7 @@ Important quota limits include CPUs, in-use IP addresses, and disk size.
 
 Once configured, start your cluster.
 
-4. Upload input list file, config file, and `bigtools` source to the gridengine cluster master
+4. **Upload input list file, config file, and** ``bigtools`` **source to the gridengine cluster master**
 
 .. code-block:: shell
 
@@ -342,7 +342,7 @@ Once configured, start your cluster.
   put -r src
   EOF
 
-5. Launch the job
+5. **Launch the job**
 
 SSH to the master instance
  
