@@ -49,7 +49,7 @@ To use the ``compress`` sample, you will need to download both the ``bigtools`` 
 and the repository for `Elasticluster`_ to your local workstation or laptop. No specific
 relationship exists between these two repositories. But in the following instructions, it is
 assumed that the ``bigtools`` and ``elasticluster`` directories are siblings under a
-``BIGTOOLS_ROOT`` directory.
+workspace root (``WS_ROOT``) directory.
 
 -------------------
 Running the samples
@@ -65,23 +65,28 @@ of the samples. Samples are provided for the following uses:
 The samples provided here each list just 6 files to work on, and the instructions below demonstrate
 spreading the processing over 3 worker instances.
 
-1. **Create a cluster of Compute Engine instances with Grid Engine installed and configured**
+1. **Create a cluster of Compute Engine instances running Grid Engine**
 
-In your current shell, set your directory to your selected ``BIGTOOLS_ROOT`` and then
-follow the instructions
-`here <http://googlegenomics.readthedocs.org/en/staging-2/includes/elasticluster_setup.html>`_
-to configure a Grid Engine cluster using Elasticluster.
+   In your current shell:
+
+   a. ``cd ${WS_ROOT}``
+   b. Follow the instructions to
+      `configure a Grid Engine cluster using Elasticluster
+      <http://googlegenomics.readthedocs.org/en/staging-2/includes/elasticluster_setup.html>`_
 
 2. **Download the** ``bigtools`` **repository (if you have not already done so)**
 
-   a. cd $BIGTOOLS_ROOT
-   b. git clone https://github.com/googlegenomics/bigtools.git
-   c. cd bigtools
+.. code-block:: shell
+
+   cd ${WS_ROOT}
+   git clone https://github.com/googlegenomics/bigtools.git
 
 3. **Upload the** `src` **and** `samples` **directories to the Grid Engine master instance:**
 
 .. code-block:: shell
 
+  cd bigtools
+  
   elasticluster sftp gridengine << 'EOF'
   mkdir src
   put -r src
@@ -285,7 +290,7 @@ To run your own job to compress/decompress a list of files requires the followin
 The following instructions provide guidance on each of these steps.
 It is recommended, though not a requirement, that you save your ``input list file`` and ``job config file``
 to a directory outside the ``bigtools`` directory. For example, you might create a directory
-``$BIGTOOLS_ROOT/my_jobs``.
+``${WS_ROOT}/my_jobs``.
 
 1. **Create an** ``input list file``
 
@@ -294,7 +299,7 @@ is with ``gsutil``. For example:
 
 .. code-block:: shell
 
-  gsutil ls gs://MY_BUCKET/PATH/*.vcf.bz2 > $BIGTOOLS_ROOT/my_jobs/compressed_vcf_list_file.txt
+  gsutil ls gs://MY_BUCKET/PATH/*.vcf.bz2 > ${WS_ROOT}/my_jobs/compressed_vcf_list_file.txt
   
 2. **Create a** ``job config file``
 
