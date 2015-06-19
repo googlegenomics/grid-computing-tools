@@ -81,7 +81,7 @@ spreading the processing over 3 worker instances.
    cd ${WS_ROOT}
    git clone https://github.com/googlegenomics/bigtools.git
 
-3. **Upload the** `src` **and** `samples` **directories to the Grid Engine master instance:**
+3. **Upload the** ``src`` **and** ``samples`` **directories to the Grid Engine master instance:**
 
 .. code-block:: shell
 
