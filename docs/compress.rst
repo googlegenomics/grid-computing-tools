@@ -150,25 +150,25 @@ Cloud project to which you have write access.
 
 You can run all of the samples, or the just those that model your particular use-case.
 
-* Compress a list of files using bzip2
+* Compress a list of files using bzip2 [ Estimated time to complete: 35 minutes ]
 
 .. code-block:: shell
 
   ./src/compress/launch_compress.sh ./samples/compress/bzip2_compress_config.sh
 
-* Decompress a list of files using bzip2
+* Decompress a list of files using bzip2 [ Estimated time to complete: 4 minutes ]
 
 .. code-block:: shell
 
   ./src/compress/launch_compress.sh ./samples/compress/bzip2_decompress_config.sh
 
-* Compress a list of files using gzip
+* Compress a list of files using gzip [ Estimated time to complete: 15 minutes ]
 
 .. code-block:: shell
 
   ./src/compress/launch_compress.sh ./samples/compress/gzip_compress_config.sh
 
-* Decompress a list of files using gzip
+* Decompress a list of files using gzip [ Estimated time to complete: 5 minutes ]
 
 .. code-block:: shell
 
@@ -259,13 +259,21 @@ Where the ``OUTPUT_LOG_PATH`` should be the value you specified in the job confi
 
 Where the ``OUTPUT_LOG_PATH`` should be the value you specified in the job config file (step 6 above).
 
-* Compute total time
+* Compute total task time
 
 .. code-block:: shell
 
   gsutil cat OUTPUT_LOG_PATH/* | \
     sed -n -e 's#^Task time.*: \([0-9]*\) seconds#\1#p' | \
-    awk '{ sum += $1; } END { print sum/NR }'
+    awk '{ sum += $1; } END { print sum/NR " seconds"}'
+
+* Compute average task time
+
+.. code-block:: shell
+
+  gsutil cat OUTPUT_LOG_PATH/* | \
+    sed -n -e 's#^Task time.*: \([0-9]*\) seconds#\1#p' | \
+    awk '{ sum += $1; } END { print sum " seconds"}'
 
 11. **Destroying the cluster**
 
