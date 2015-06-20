@@ -293,6 +293,7 @@ To run your own job to compress/decompress a list of files requires the followin
 #. Create a ``job config file``
 #. Create a gridengine cluster with sufficient disk space attached to each ``compute`` node
 #. Upload input list file, config file, and `bigtools` source to the gridengine cluster master
+#. Do a "dry run" (*optional*)
 #. Launch the job
 
 The following instructions provide guidance on each of these steps.
@@ -355,7 +356,43 @@ Once configured, start your cluster.
   put -r src
   EOF
 
-5. **Launch the job**
+5. **Do a "dry run"** (*optional*)
+
+The ``compress`` bigtool supports the DRYRUN environment variable.
+Setting this value to 1 when launching your job will cause the queued job to
+execute *without downloading or uploading* any files.
+
+The local output files, however, will be populated with useful information about
+what files *would* be copied. This can be useful for ensuring your file list
+is valid and that the output path is correct.
+
+For example:
+
+.. code-block:: shell
+
+   $ DRYRUN=1 ./src/compress/launch_compress.sh ./samples/compress/gzip_compress_config.sh
+   Your job-array 5.1-6:1 ("compress") has been submitted
+
+Then after waiting for the job to complete, inspect:
+
+.. code-block:: shell
+
+   $ head -n 5 compress.o3.1 
+   Task host: compute001
+   Task start: 1
+   Input list file: ./samples/compress/gzip_compress_file_list.txt
+   Output path: gs://cookbook-bucket/output_path/gzip
+   Output log path: gs://cookbook-bucket/log_path/gzip
+
+   $ grep "^Will download:" compress.o5.*
+   compress.o5.1:Will download: gs://genomics-public-data/platinum-genomes/vcf/NA12877_S1.genome.vcf to /scratch/compress.5.1/in/
+   compress.o5.2:Will download: gs://genomics-public-data/platinum-genomes/vcf/NA12878_S1.genome.vcf to /scratch/compress.5.2/in/
+   compress.o5.3:Will download: gs://genomics-public-data/platinum-genomes/vcf/NA12879_S1.genome.vcf to /scratch/compress.5.3/in/
+   compress.o5.4:Will download: gs://genomics-public-data/platinum-genomes/vcf/NA12880_S1.genome.vcf to /scratch/compress.5.4/in/
+   compress.o5.5:Will download: gs://genomics-public-data/platinum-genomes/vcf/NA12881_S1.genome.vcf to /scratch/compress.5.5/in/
+   compress.o5.6:Will download: gs://genomics-public-data/platinum-genomes/vcf/NA12882_S1.genome.vcf to /scratch/compress.5.6/in/
+
+6. **Launch the job**
 
 SSH to the master instance
  
