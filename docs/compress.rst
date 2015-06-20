@@ -133,8 +133,8 @@ for the ``OUTPUT_PATH`` and ``OUTPUT_LOG_PATH`` such as:
 
 .. code-block:: shell
 
-  export OUTPUT_PATH=gs://MY_BUCKET/output_path/bzip2
-  export OUTPUT_LOG_PATH=gs://MY_BUCKET/log_path/bzip2
+  export OUTPUT_PATH=gs://MY_BUCKET/bigtools/output_path/compress_bzip2
+  export OUTPUT_LOG_PATH=gs://MY_BUCKET/bigtools/log_path/compress_bzip2
 
 You can do this manually with the editor of your choice or you can change all of the
 ``config`` files at once with the command:
@@ -381,8 +381,8 @@ Then after waiting for the job to complete, inspect:
    Task host: compute001
    Task start: 1
    Input list file: ./samples/compress/gzip_compress_file_list.txt
-   Output path: gs://cookbook-bucket/output_path/gzip
-   Output log path: gs://cookbook-bucket/log_path/gzip
+   Output path: gs://cookbook-bucket/bigtools/output_path/compress_gzip
+   Output log path: gs://cookbook-bucket/bigtools/log_path/compress_gzip
 
    $ grep "^Will download:" compress.o5.*
    compress.o5.1:Will download: gs://genomics-public-data/platinum-genomes/vcf/NA12877_S1.genome.vcf to /scratch/compress.5.1/in/
