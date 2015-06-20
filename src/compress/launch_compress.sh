@@ -82,17 +82,8 @@ if [[ $# -lt 1 ]]; then
   exit 1
 fi
 
-# Some task-specific parameters which can be overridden in the job
+# Task-specific parameters which can be overridden in the job
 # config file.
-#
-# The timeout should be set to a very large value that really indicates
-# that something has gone very wrong.
-# TODO: add finer grained timeouts:
-#       DOWNLOAD_TIMEOUT
-#       PROCESSING_TIMEOUT
-#       UPLOAD_TIMEOUT
-export TASK_TIMEOUT=60m
-export TASK_MAX_ATTEMPTS=3
 export TASK_SCRATCH_DIR=/scratch
 
 readonly CONFIG_FILE=${1}

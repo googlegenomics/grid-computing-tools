@@ -81,22 +81,13 @@ readonly INPUT_PATTERN=$(sed -n "${SGE_TASK_ID}p" ${INPUT_LIST_FILE})
 bigtools_log::emit "Processing ${INPUT_PATTERN}"
 
 # Launch the job
-for ((i = 0; i < ${TASK_MAX_ATTEMPTS}; i++)); do
-  # Access to GCS can hang at times; just whack the job and try again
-  if timeout ${TASK_TIMEOUT} \
-      ${SRC_ROOT}/compress/do_compress.sh \
+if ${SRC_ROOT}/compress/do_compress.sh \
       ${WORKSPACE_DIR} \
       ${INPUT_PATTERN} \
       ${OUTPUT_PATH}; then
-    bigtools_log::emit "Task end SUCCESS: ${SGE_TASK_ID}"
-    finish
-    exit 0
-  fi
+  bigtools_log::emit "Task end SUCCESS: ${SGE_TASK_ID}"
+else
+  bigtools_log::emit "Task end FAILURE: ${SGE_TASK_ID}"
+fi
 
-  bigtools_log::emit "Retrying task ${SGE_TASK_ID}"
-done
-
-# All done
-bigtools_log::emit "Task end FAILURE: ${SGE_TASK_ID}"
 finish
-
