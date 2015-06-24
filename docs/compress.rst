@@ -45,7 +45,7 @@ single file, (de)compress it, and upload it back to Cloud Storage.
 -------------------
 Directory structure
 -------------------
-To use the ``compress`` sample, you will need to download both the ``bigtools`` repository
+To use the BigTool, you will need to download both the ``bigtools`` repository
 and the repository for `Elasticluster`_ to your local workstation or laptop. No specific
 relationship exists between these two repositories. But in the following instructions, it is
 assumed that the ``bigtools`` and ``elasticluster`` directories are siblings under a
@@ -401,6 +401,8 @@ SSH to the master instance
   elasticluster ssh gridengine
 
 Run the launch script, passing in the config file:
+
+.. code-block:: shell
 
   ./src/compress/launch_compress.sh my_job_config.sh
   
