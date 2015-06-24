@@ -22,7 +22,7 @@ Or suppose you have thousands of VCFs, and you did not compress them when origin
 copying them to Google Cloud Storage, but these VCFs can now be compressed and archived.
 
 The ``compress`` BigTool can be used for any of these situations if your compression
-scheme is either gzip or bzip2.
+scheme is either `gzip`_ or `bzip2`_.
 
 --------------------------------
 Overview of the compress BigTool
