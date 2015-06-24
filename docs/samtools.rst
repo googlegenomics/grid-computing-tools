@@ -1,5 +1,4 @@
-.. _gzip: http://www.gzip.org/ 
-.. _bzip2: http://www.bzip.org/
+.. _samtools: http://www.htslib.org/
 .. _Google Compute Engine: https://cloud.google.com/compute/
 .. _Grid Engine: http://gridengine.info/
 .. _Elasticluster: https://elasticluster.readthedocs.org
@@ -13,14 +12,14 @@ Run Samtools on files in Google Cloud Storage
 Suppose you have thousands of BAMs, which you have stored in Google Cloud Storage,
 and you need to create index files (BAI) for them.
 
-The ``samtools`` BigTool can be used to create those index files.
+The ``samtools`` BigTool can be used to create those index files using `samtools`_.
 
 --------------------------------
 Overview of the samtools BigTool
 --------------------------------
 
-The `samtools` BigTool takes advantage of two key technologies to quickly run
-samtools operations over a large number of files:
+This BigTool takes advantage of two key technologies to quickly run `samtools`
+operations over a large number of files:
 
 * `Google Compute Engine`_
 * `Grid Engine`_ (SGE)
@@ -91,7 +90,7 @@ The syntax for running the sample is:
 
 .. code-block:: shell
 
-  ./src/compress/launch_compress.sh [config_file]
+  ./src/samtools/launch_samtools.sh [config_file]
 
 The ``config_file`` lists two sets of key parameters:
 
@@ -116,8 +115,8 @@ for the ``OUTPUT_PATH`` and ``OUTPUT_LOG_PATH`` such as:
 
 .. code-block:: shell
 
-  export OUTPUT_PATH=gs://MY_BUCKET/bigtools/output_path/compress_bzip2
-  export OUTPUT_LOG_PATH=gs://MY_BUCKET/bigtools/log_path/compress_bzip2
+  export OUTPUT_PATH=gs://MY_BUCKET/bigtools/output_path/samtools_index
+  export OUTPUT_LOG_PATH=gs://MY_BUCKET/bigtools/log_path/samtools_index
 
 You can do this manually with the editor of your choice or you can change the
 ``config`` file with the command:
@@ -135,7 +134,7 @@ Cloud project to which you have write access.
 
 .. code-block:: shell
 
-  ./src/compress/launch_compress.sh ./samples/samtools/samtools_index_config.sh
+  ./src/samtools/launch_samtools.sh ./samples/samtools/samtools_index_config.sh
 
 When successfully launched, Grid Engine should emit a message such as:
 
@@ -336,7 +335,7 @@ For example:
 .. code-block:: shell
 
    $ DRYRUN=1 ./src/samtools/launch_samtools.sh ./samples/samtools/samtools_config.sh
-   Your job-array 5.1-6:1 ("compress") has been submitted
+   Your job-array 5.1-6:1 ("samtools") has been submitted
 
 Then after waiting for the job to complete, inspect:
 
@@ -344,20 +343,20 @@ Then after waiting for the job to complete, inspect:
 
 .. code-block:: shell
 
-   $ head -n 5 compress.o3.1 
+   $ head -n 5 samtools.o3.1 
    Task host: compute001
    Task start: 1
-   Input list file: ./samples/compress/gzip_compress_file_list.txt
-   Output path: gs://cookbook-bucket/bigtools/output_path/compress_gzip
-   Output log path: gs://cookbook-bucket/bigtools/log_path/compress_gzip
+   Input list file: ./samples/samtools/samtools_index_file_list.txt
+   Output path: gs://cookbook-bucket/bigtools/output_path/samtools_index
+   Output log path: gs://cookbook-bucket/bigtools/log_path/samtools_index
 
-   $ grep "^Will download:" compress.o5.*
-   compress.o5.1:Will download: gs://genomics-public-data/platinum-genomes/vcf/NA12877_S1.genome.vcf to /scratch/compress.5.1/in/
-   compress.o5.2:Will download: gs://genomics-public-data/platinum-genomes/vcf/NA12878_S1.genome.vcf to /scratch/compress.5.2/in/
-   compress.o5.3:Will download: gs://genomics-public-data/platinum-genomes/vcf/NA12879_S1.genome.vcf to /scratch/compress.5.3/in/
-   compress.o5.4:Will download: gs://genomics-public-data/platinum-genomes/vcf/NA12880_S1.genome.vcf to /scratch/compress.5.4/in/
-   compress.o5.5:Will download: gs://genomics-public-data/platinum-genomes/vcf/NA12881_S1.genome.vcf to /scratch/compress.5.5/in/
-   compress.o5.6:Will download: gs://genomics-public-data/platinum-genomes/vcf/NA12882_S1.genome.vcf to /scratch/compress.5.6/in/
+   $ grep "^Will download:" samtools.o5.*
+   samtools.o5.1:Will download: gs://genomics-public-data/ftp-trace.ncbi.nih.gov/1000genomes/ftp/technical/pilot2_high_cov_GRCh37_bams/data/NA12878/alignment/NA12878.chrom9.SOLID.bfast.CEU.high_coverage.20100125.bam to /scratch/samtools.5.1/in/
+   samtools.o5.2:Will download: gs://genomics-public-data/ftp-trace.ncbi.nih.gov/1000genomes/ftp/technical/pilot2_high_cov_GRCh37_bams/data/NA12878/alignment/NA12878.chrom1.LS454.ssaha2.CEU.high_coverage.20100311.bam to /scratch/samtools.5.2/in/
+   samtools.o5.3:Will download: gs://genomics-public-data/ftp-trace.ncbi.nih.gov/1000genomes/ftp/pilot_data/data/NA12878/alignment/NA12878.chrom11.SOLID.corona.SRP000032.2009_08.bam to /scratch/samtools.5.3/in/
+   samtools.o5.4:Will download: gs://genomics-public-data/ftp-trace.ncbi.nih.gov/1000genomes/ftp/pilot_data/data/NA12878/alignment/NA12878.chrom12.SOLID.corona.SRP000032.2009_08.bam to /scratch/samtools.5.4/in/
+   samtools.o5.5:Will download: gs://genomics-public-data/ftp-trace.ncbi.nih.gov/1000genomes/ftp/pilot_data/data/NA12878/alignment/NA12878.chrom10.SOLID.corona.SRP000032.2009_08.bam to /scratch/samtools.5.5/in/
+   samtools.o5.6:Will download: gs://genomics-public-data/ftp-trace.ncbi.nih.gov/1000genomes/ftp/pilot_data/data/NA12878/alignment/NA12878.chromX.SOLID.corona.SRP000032.2009_08.bam to /scratch/samtools.5.6/in/
 
 6. **Launch the job**
 
@@ -369,6 +368,8 @@ SSH to the master instance
 
 Run the launch script, passing in the config file:
 
-  ./src/compress/launch_samtools.sh my_job_config.sh
+.. code-block:: shell
+
+  ./src/samtools/launch_samtools.sh my_job_config.sh
   
 where *my_job_config.sh* is replaced by the name of your config file created in step 2.
