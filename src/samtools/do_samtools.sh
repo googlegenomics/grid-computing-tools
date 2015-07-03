@@ -87,8 +87,8 @@ END=$(date +%s)
 logging::emit "Update: ${#FILE_LIST[@]} files in $((END-START)) seconds"
 
 # Upload the output file(s)
-if [[ ${DRYRUN:-} -eq 1 ]]; then
-  exit 0
+if [[ ${OUTPUT_PATH} == "source" ]]; then
+  OUTPUT_PATH=$(dirname ${INPUT_PATH})
 fi
 gcs_util::upload "${OUTFILE}" "${OUTPUT_PATH}/"
 
