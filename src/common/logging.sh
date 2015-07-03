@@ -18,26 +18,26 @@
 #
 # Provides basic logging services.
 # Client's of this utility script should:
-#  * Set BIGTOOLS_LOG_FILE
-#  * Call bigtools_log::log to write messages to the log
-#  * Call bigtools_log::emit to write to stdout and to the log
+#  * Set LOGGING_LOG_FILE
+#  * Call logging::log to write messages to the log
+#  * Call logging::emit to write to stdout and to the log
 
-# bigtools_log::log
+# logging::log
 #
-# The log function will echo the input parameters to the BIGTOOLS_LOG_FILE
-function bigtools_log::log() {
-  if [[ -n ${BIGTOOLS_LOG_FILE:-} ]]; then
-    echo "${@}" >> ${BIGTOOLS_LOG_FILE}
+# The log function will echo the input parameters to the LOGGING_LOG_FILE
+function logging::log() {
+  if [[ -n ${LOGGING_LOG_FILE:-} ]]; then
+    echo "${@}" >> ${LOGGING_LOG_FILE}
   fi
 }
-readonly -f bigtools_log::log
+readonly -f logging::log
 
-# bigtools_log::emit
+# logging::emit
 #
 # The emit function will echo the input parameters to stdout
-# and will also emit the input to the BIGTOOLS_LOG_FILE
-function bigtools_log::emit() {
+# and will also emit the input to the LOGGING_LOG_FILE
+function logging::emit() {
   echo "${@}"
-  bigtools_log::log ${@}
+  logging::log ${@}
 }
-readonly -f bigtools_log::emit
+readonly -f logging::emit

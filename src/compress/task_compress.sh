@@ -41,16 +41,16 @@ readonly WORKSPACE_DIR=${TASK_SCRATCH_DIR}/${JOB_NAME}.${JOB_ID}.${SGE_TASK_ID}
 sudo mkdir -p ${WORKSPACE_DIR} -m 777
 
 # Set the log file
-export BIGTOOLS_LOG_FILE=${WORKSPACE_DIR}/${JOB_NAME}.${JOB_ID}.${SGE_TASK_ID}.log
+export LOGGING_LOG_FILE=${WORKSPACE_DIR}/${JOB_NAME}.${JOB_ID}.${SGE_TASK_ID}.log
 readonly TASK_START_TIME=$(date '+%s')
 
 # For debugging, emit the hostname and inputs
-bigtools_log::emit "Task host: $(hostname)"
-bigtools_log::emit "Task start: ${SGE_TASK_ID}"
-bigtools_log::emit "Input list file: ${INPUT_LIST_FILE}"
-bigtools_log::emit "Output path: ${OUTPUT_PATH}"
-bigtools_log::emit "Output log path: ${OUTPUT_LOG_PATH:-}"
-bigtools_log::emit "Scratch dir: ${TASK_SCRATCH_DIR}"
+logging::emit "Task host: $(hostname)"
+logging::emit "Task start: ${SGE_TASK_ID}"
+logging::emit "Input list file: ${INPUT_LIST_FILE}"
+logging::emit "Output path: ${OUTPUT_PATH}"
+logging::emit "Output log path: ${OUTPUT_LOG_PATH:-}"
+logging::emit "Scratch dir: ${TASK_SCRATCH_DIR}"
 
 # Set up an EXIT trap to be sure to clean up
 function exit_clean() {
@@ -67,8 +67,8 @@ function finish() {
     local start=${TASK_START_TIME}
     local end=$(date '+%s')
 
-    bigtools_log::emit "Task time ${SGE_TASK_ID}: $((end - start)) seconds"
-    gcs_util::upload_log "${BIGTOOLS_LOG_FILE}" "${OUTPUT_LOG_PATH}/"
+    logging::emit "Task time ${SGE_TASK_ID}: $((end - start)) seconds"
+    gcs_util::upload_log "${LOGGING_LOG_FILE}" "${OUTPUT_LOG_PATH}/"
   fi
 }
 readonly -f finish
@@ -78,16 +78,16 @@ gcs_util::install_crcmod
 
 # Grab the record to process
 readonly INPUT_PATTERN=$(sed -n "${SGE_TASK_ID}p" ${INPUT_LIST_FILE})
-bigtools_log::emit "Processing ${INPUT_PATTERN}"
+logging::emit "Processing ${INPUT_PATTERN}"
 
 # Launch the job
 if ${SRC_ROOT}/compress/do_compress.sh \
       ${WORKSPACE_DIR} \
       ${INPUT_PATTERN} \
       ${OUTPUT_PATH}; then
-  bigtools_log::emit "Task end SUCCESS: ${SGE_TASK_ID}"
+  logging::emit "Task end SUCCESS: ${SGE_TASK_ID}"
 else
-  bigtools_log::emit "Task end FAILURE: ${SGE_TASK_ID}"
+  logging::emit "Task end FAILURE: ${SGE_TASK_ID}"
 fi
 
 finish

@@ -7,5 +7,5 @@
 export SAMTOOLS_OPERATION="index"
 
 export INPUT_LIST_FILE=./samples/samtools/samtools_index_input_list_file.txt
-export OUTPUT_PATH=gs://MY_BUCKET/bigtools/output_path/samtools_index
-export OUTPUT_LOG_PATH=gs://MY_BUCKET/bigtools/log_path/samtools_index
+export OUTPUT_PATH=gs://MY_BUCKET/output_path/samtools_index
+export OUTPUT_LOG_PATH=gs://MY_BUCKET/log_path/samtools_index

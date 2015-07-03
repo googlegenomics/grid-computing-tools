@@ -23,9 +23,9 @@ function gcs_util::install_crcmod() {
   local crcmod_installed=$(\
     gsutil version -l | sed -n -e 's/^compiled crcmod: *//p')
 
-  bigtools_log::emit "Compiled crcmod installed: ${crcmod_installed}"
+  logging::emit "Compiled crcmod installed: ${crcmod_installed}"
   if [[ ${crcmod_installed} != "True" ]]; then
-    bigtools_log::emit "Installing compiled crcmod"
+    logging::emit "Installing compiled crcmod"
     sudo apt-get update --yes
     sudo apt-get install --yes gcc python-dev python-setuptools
     sudo easy_install -U pip
@@ -49,7 +49,7 @@ function gcs_util::download() {
   local remote_path=${1}
   local local_path=${2}
 
-  bigtools_log::emit "Will download: ${remote_path} to ${local_path}"
+  logging::emit "Will download: ${remote_path} to ${local_path}"
   if [[ ${DRYRUN:-} -eq 1 ]]; then
     return
   fi
@@ -69,8 +69,8 @@ function gcs_util::download() {
   local bytes=$((bytes_end - bytes_start))
   local time=$((time_end - time_start))
 
-  bigtools_log::emit "Download: ${bytes} bytes in ${time} seconds"
-  bigtools_log::emit "Download rate: $(( (bytes/1000/1000) / time )) MB/s"
+  logging::emit "Download: ${bytes} bytes in ${time} seconds"
+  logging::emit "Download rate: $(( (bytes/1000/1000) / time )) MB/s"
 }
 readonly -f gcs_util::download
 
@@ -88,7 +88,7 @@ function gcs_util::upload() {
   local local_path=${1}
   local remote_path=${2}
 
-  bigtools_log::emit "Will upload: ${local_path} to ${remote_path}"
+  logging::emit "Will upload: ${local_path} to ${remote_path}"
   if [[ ${DRYRUN:-} -eq 1 ]]; then
     return
   fi
@@ -103,8 +103,8 @@ function gcs_util::upload() {
 
   local time=$((time_end - time_start))
 
-  bigtools_log::emit "Upload: ${bytes} bytes in ${time} seconds"
-  bigtools_log::emit "Upload rate: $(( (bytes/1000/1000) / time )) MB/s"
+  logging::emit "Upload: ${bytes} bytes in ${time} seconds"
+  logging::emit "Upload rate: $(( (bytes/1000/1000) / time )) MB/s"
 }
 readonly -f gcs_util::upload
 
@@ -118,7 +118,7 @@ function gcs_util::upload_log() {
   local local_path=${1}
   local remote_path=${2}
 
-  bigtools_log::emit "Upload log: ${local_path} to ${remote_path}"
+  logging::emit "Upload log: ${local_path} to ${remote_path}"
   if [[ ${DRYRUN:-} -eq 1 ]]; then
     return
   fi

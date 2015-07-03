@@ -58,7 +58,7 @@ readonly FILE_LIST
 # Process the input files
 START=$(date +%s)
 for FILE in "${FILE_LIST[@]}"; do
-  bigtools_log::emit "Processing file ${FILE}"
+  logging::emit "Processing file ${FILE}"
 
   case "${SAMTOOLS_OPERATION}" in
     index)
@@ -69,12 +69,12 @@ for FILE in "${FILE_LIST[@]}"; do
       CMD="samtools index ${INFILE}"
       ;;
     *)
-      bigtools_log::emit "Unknown operation: ${SAMTOOLS_OPERATION}"
+      logging::emit "Unknown operation: ${SAMTOOLS_OPERATION}"
       exit 1
       ;;
   esac
 
-  bigtools_log::emit "Command: ${CMD}"
+  logging::emit "Command: ${CMD}"
 
   if [[ ${DRYRUN:-} -eq 1 ]]; then
     continue
@@ -84,7 +84,7 @@ for FILE in "${FILE_LIST[@]}"; do
 done
 END=$(date +%s)
 
-bigtools_log::emit "Update: ${#FILE_LIST[@]} files in $((END-START)) seconds"
+logging::emit "Update: ${#FILE_LIST[@]} files in $((END-START)) seconds"
 
 # Upload the output file(s)
 if [[ ${DRYRUN:-} -eq 1 ]]; then
