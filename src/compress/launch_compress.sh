@@ -138,5 +138,6 @@ qsub \
   -S /bin/bash \
   -V \
   -N compress \
+  -r y \
   ${COMPRESS_SRC_ROOT}/task_compress.sh
 

@@ -132,5 +132,6 @@ qsub \
   -S /bin/bash \
   -V \
   -N samtools \
+  -r y \
   ${SAMTOOLS_SRC_ROOT}/task_samtools.sh
 

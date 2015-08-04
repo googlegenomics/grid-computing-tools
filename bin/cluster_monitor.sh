@@ -30,6 +30,11 @@
 set -o errexit
 set -o nounset
 
+if [[ $# -lt 1 ]]; then
+  echo "Usage: ${0} [cluster] <sleep_minutes>"
+  exit 1
+fi
+
 readonly CLUSTER=${1}
 readonly SLEEP_MINUTES=${2:-10}
 
