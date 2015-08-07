@@ -16,10 +16,9 @@
 
 # ensure_cluster_size.py
 #
-# Makes a pass over the specified cluster and removes any nodes that are
-# in a TERMINATED, STOPPING, or unknown state.
 # Makes a pass over the specified cluster and adds nodes such that the
-# number of nodes is consistent with the value in the cluster configuration.
+# number of nodes is at least as high (hopefully equal to) the value in
+# the cluster configuration.
 
 import elasticluster
 import cluster_util
@@ -28,27 +27,20 @@ import os
 import sys
 
 # Check usage
-if len(sys.argv) < 2 or len(sys.argv) > 3:
-  print "Usage: {} [cluster] <node_type>".format(sys.argv[0])
+if len(sys.argv) != 2:
+  print "Usage: {} [cluster]".format(sys.argv[0])
   sys.exit(1)
 
 cluster_name=sys.argv[1]
-node_type=sys.argv[2] if len(sys.argv) > 2 else None
 
 # Testing modes
 #
-# DRYRUN=1: do not remove any nodes, just display a log of the operations
+# DRYRUN=1: do not add any nodes, just display a log of the operations
 #           that would occur
-# REMOVENODES=<node list>: remove the requested node(s)
 
 dryrun=os.environ['DRYRUN'] if 'DRYRUN' in os.environ else None
-removenodes=os.environ['REMOVENODES'].split(',') \
-  if 'REMOVENODES' in os.environ else []
 
 # BEGIN MAIN
-
-known_hosts_file = '%s/%s' % (
-  os.environ['HOME'], '.elasticluster/storage/%s.known_hosts' % cluster_name)
 
 # Create the elasticluster configuration endpoint
 configurator = elasticluster.get_configurator()
@@ -57,55 +49,25 @@ configurator = elasticluster.get_configurator()
 cluster = configurator.load_cluster(cluster_name)
 cluster.update()
 
-# Build a list of nodes to remove
-if removenodes:
-  print "Testing with node list: %s" % ",".join(removenodes)
-  to_remove = cluster_util.get_nodes_by_name(cluster, removenodes)
-else:
-  print "************************************"
-  print "Determining status of existing nodes"
-  print "************************************"
-  to_remove = \
-    cluster_util.get_stopped_or_terminated_nodes(cluster, node_type)
-print
-
-if to_remove:
-  print "***************"
-  print "Removing nodes:"
-  print "***************"
-else:
-  print "******************"
-  print "No nodes to remove"
-  print "******************"
-print
-  
-for node in to_remove:
-  print "Removing node %s (%s)" % (node.name, node.preferred_ip)
-  if not dryrun:
-    cluster_util.run_elasticluster(
-      ['remove-node', '--yes', cluster_name, node.name])
-
-    cluster_util.remove_known_hosts_entry(node, known_hosts_file)
-
 print "*********************"
 print "Checking cluster size"
 print "*********************"
 
-# Re-load the cluster
-cluster = configurator.load_cluster(cluster_name)
-cluster.update()
-
 target_nodes = cluster_util.get_desired_cluster_nodes(cluster_name)
 
-for kind in cluster.nodes:
+for kind in target_nodes:
+  has_count = len(cluster.nodes[kind]) if kind in cluster.nodes else 0
   print "Node type (%s): Has: %d, Should have: %d" % (
-    kind, len(cluster.nodes[kind]), target_nodes[kind])
+    kind, has_count, target_nodes[kind])
 
-  diff = target_nodes[kind] - len(cluster.nodes[kind])
+  diff = target_nodes[kind] - has_count
   if diff > 0:
     print "Adding new nodes of type %s" % kind
     print
     if not dryrun:
       cluster_util.run_elasticluster(
-        ['resize', cluster_name, '-a' '%d:%s' % (diff, kind)])
-
+        ['resize', cluster_name,
+           '-a' '%d:%s' % (diff, kind),
+           '-t', cluster_name])
+  elif diff < 0:
+    print "WARNING: There are more nodes of type %s than configured" % kind

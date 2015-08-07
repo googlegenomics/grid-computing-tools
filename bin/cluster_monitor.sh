@@ -41,6 +41,8 @@ readonly SLEEP_MINUTES=${2:-10}
 readonly SCRIPT_DIR=$(dirname $0)
 
 while :; do
+  python ${SCRIPT_DIR}/remove_terminated_nodes.py ${CLUSTER}
+
   python ${SCRIPT_DIR}/ensure_cluster_size.py ${CLUSTER}
 
   echo "Sleeping for ${SLEEP_MINUTES} minutes"

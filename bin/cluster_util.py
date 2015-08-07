@@ -26,6 +26,9 @@ import subprocess
 def remove_known_hosts_entry(node, known_hosts_file):
   """For a give node, remove any host key entries in the known_hosts file"""
 
+  if not node.preferred_ip:
+    return False
+
   ip=node.preferred_ip
 
   # Assume concurrency on the known_hosts file is not an issue
@@ -39,6 +42,7 @@ def remove_known_hosts_entry(node, known_hosts_file):
       if not line.startswith(ip + " "):
         f.write(line)
 
+  return True
 
 def get_zone_for_cluster(cluster_name):
   """Returns the GCE zone associated with the cluster.
@@ -103,7 +107,7 @@ def get_nodes_with_status(cluster, node_type, status_list):
   return node_list
 
 
-def get_stopped_or_terminated_nodes(cluster, node_type):
+def get_stopping_or_terminated_nodes(cluster, node_type):
   """Returns a list of nodes with STOPPING, TERMINATED, or UNKNOWN status"""
 
   # Adding nodes with "UNKNOWN" may be an incorrect assumption;
