@@ -72,7 +72,7 @@ while :; do
 
      # To get the uptime of the system, grab the first value from /proc/uptime
      # If we fail to connect to the target host, the output will be empty.
-     UPTIME_SEC=$(ssh -o ConnectTimeout=5 ${NODE} \
+     UPTIME_SEC=$(ssh -o ConnectTimeout=20 ${NODE} \
                     cat /proc/uptime | awk '{ print $1 }')
 
      RESTART_TASK=0
