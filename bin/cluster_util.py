@@ -70,7 +70,7 @@ def get_nodes_by_name(cluster, node_name_list):
   return node_list
 
 
-def get_node_status(node, zone):
+def get_node_status(project_id, node, zone):
   """Returns the GCE instance status for the specified zone"""
   if not node.instance_id:
     print "node %s has no instance_id"
@@ -78,7 +78,9 @@ def get_node_status(node, zone):
 
   try:
     print "Get status for %s (%s)" % (node.name, node.instance_id)
-    out = subprocess.check_output(["gcloud", "compute", "instances",
+    out = subprocess.check_output(["gcloud",
+                                   "--project", project_id,
+                                   "compute", "instances",
                                    "describe", node.instance_id,
                                    "--zone", zone,
                                    "--format", "json"],
@@ -96,10 +98,11 @@ def get_nodes_with_status(cluster, node_type, status_list):
   node_list = []
 
   zone = get_zone_for_cluster(cluster.name)
+  project_id = cluster.cloud_provider._project_id
 
   for node in cluster.get_all_nodes():
     if not node_type or node['kind'] == node_type:
-      status = get_node_status(node, zone)
+      status = get_node_status(project_id, node, zone)
 
       if status in status_list:
         node_list.append(node)
