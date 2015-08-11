@@ -39,6 +39,9 @@ readonly JOB_ID=${1}
 readonly TIMEOUT_MINUTES=${2}
 readonly QUEUE_NAME=${3:-all.q}
 
+readonly CONNECT_TIMEOUT=15
+readonly CONNECT_RETRIES=5
+
 readonly JOB_NAME=$(
   qstat -j ${JOB_ID} | sed --quiet -e 's#job_name: *\(.*\)#\1#p')
 
@@ -54,7 +57,6 @@ while :; do
 
    # Grab all of the lines for this job
    # For each line - check the status of the associated node
-
    TASK_LIST=$(qstat | \
                awk -v job=${JOB_ID} -v queue=${QUEUE_NAME} \
                '$1 == job && $8 ~ queue"@" {
@@ -72,8 +74,14 @@ while :; do
 
      # To get the uptime of the system, grab the first value from /proc/uptime
      # If we fail to connect to the target host, the output will be empty.
-     UPTIME_SEC=$(ssh -o ConnectTimeout=20 ${NODE} \
-                    cat /proc/uptime | awk '{ print $1 }')
+     UPTIME_SEC=
+     for ((i = 0; i < ${CONNECT_RETRIES}; i++)); do
+       UPTIME_SEC=$(ssh -o ConnectTimeout=${CONNECT_TIMEOUT} ${NODE} \
+                      cat /proc/uptime | awk '{ print $1 }')
+       if [[ -n ${UPTIME_SEC} ]]; then
+         break
+       fi
+     done
 
      RESTART_TASK=0
      if [[ -z ${UPTIME_SEC} ]]; then
