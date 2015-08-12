@@ -22,6 +22,7 @@
 import elasticluster
 import cluster_util
 
+import errno
 import os
 import sys
 
@@ -85,4 +86,9 @@ for node in to_remove:
 
     if not cluster_util.remove_known_hosts_entry(node, known_hosts_file):
       print "No preferred ip for node; removing file %s" % known_hosts_file
-      os.remove(known_hosts_file)
+      try:
+        os.remove(known_hosts_file)
+      except OSError as e:
+        if e.errno != errno.ENOENT:
+          raise
+
