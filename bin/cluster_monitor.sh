@@ -40,10 +40,36 @@ readonly SLEEP_MINUTES=${2:-10}
 
 readonly SCRIPT_DIR=$(dirname $0)
 
-while :; do
-  python ${SCRIPT_DIR}/remove_terminated_nodes.py ${CLUSTER}
+readonly TMPFILE=/tmp/$(basename $0)-${CLUSTER}.log
 
-  python ${SCRIPT_DIR}/ensure_cluster_size.py ${CLUSTER}
+# Sometimes when adding or removing nodes, elasticluster configuration
+# of the cluster fails. When it does, it emits a message indicating
+# "please re-run elasticluster setup" (thought it exits with a success (0)
+# status code).
+#
+# We capture each add/remove node operation to a logfile and then just grep
+# for the error message. If we find it, then we re-run elasticluster setup.
+function check_rerun_elasticluster_setup() {
+  if grep --quiet --ignore-case \
+    "please re-run elasticluster setup" ${TMPFILE}; then
+    elasticluster setup ${CLUSTER}
+  fi
+}
+readonly -f check_rerun_elasticluster_setup
+
+# MAIN loop
+
+while :; do
+  # Remove any terminated nodes
+  python ${SCRIPT_DIR}/remove_terminated_nodes.py ${CLUSTER} 2>&1 | tee ${TMPFILE}
+  check_rerun_elasticluster_setup
+
+  # Remove server keys for removed nodes from the known_host file 
+  python ${SCRIPT_DIR}/sanitize_known_hosts.py ${CLUSTER}
+
+  # Add new nodes so that the cluster is at full strength
+  python ${SCRIPT_DIR}/ensure_cluster_size.py ${CLUSTER} 2>&1 | tee ${TMPFILE}
+  check_rerun_elasticluster_setup
 
   echo "Sleeping for ${SLEEP_MINUTES} minutes"
   sleep ${SLEEP_MINUTES}m
