@@ -50,10 +50,12 @@ readonly TMPFILE=/tmp/$(basename $0)-${CLUSTER}.log
 # We capture each add/remove node operation to a logfile and then just grep
 # for the error message. If we find it, then we re-run elasticluster setup.
 function check_rerun_elasticluster_setup() {
-  if grep --quiet --ignore-case \
-    "please re-run elasticluster setup" ${TMPFILE}; then
-    elasticluster setup ${CLUSTER}
-  fi
+  while grep --quiet --ignore-case \
+    "please re-run elasticluster setup" ${TMPFILE}; do
+    echo "Setup errors detected. Running: elasticluster setup -v ${CLUSTER}"
+    elasticluster setup -v ${CLUSTER} 2>&1 | tee ${TMPFILE}
+    echo "Finished running: elasticluster setup -v ${CLUSTER}"
+  done
 }
 readonly -f check_rerun_elasticluster_setup
 
@@ -61,14 +63,14 @@ readonly -f check_rerun_elasticluster_setup
 
 while :; do
   # Remove any terminated nodes
-  python ${SCRIPT_DIR}/remove_terminated_nodes.py ${CLUSTER} 2>&1 | tee ${TMPFILE}
+  python -u ${SCRIPT_DIR}/remove_terminated_nodes.py ${CLUSTER} 2>&1 | tee ${TMPFILE}
   check_rerun_elasticluster_setup
 
   # Remove server keys for removed nodes from the known_host file 
-  python ${SCRIPT_DIR}/sanitize_known_hosts.py ${CLUSTER}
+  python -u ${SCRIPT_DIR}/sanitize_known_hosts.py ${CLUSTER}
 
   # Add new nodes so that the cluster is at full strength
-  python ${SCRIPT_DIR}/ensure_cluster_size.py ${CLUSTER} 2>&1 | tee ${TMPFILE}
+  python -u ${SCRIPT_DIR}/ensure_cluster_size.py ${CLUSTER} 2>&1 | tee ${TMPFILE}
   check_rerun_elasticluster_setup
 
   echo "Sleeping for ${SLEEP_MINUTES} minutes"

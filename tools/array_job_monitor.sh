@@ -32,22 +32,42 @@
 # ended up with tasks stuck in a "r"unning state on machines that had
 # been terminated.
 
+# usage:
+#   array_job_monitor.sh <job_id> [monitor_interval] [task_timeout] [queue_name]
+#
+# parameters:
+#   job_id:
+#     Grid Engine job ID to monitor
+#   monitor_interval:
+#     Minutes to sleep between checks of running tasks
+#     Default: 15 minutes
+#   task_timeout:
+#     Number of minutes a task may run before it is considered stalled,
+#     and is eligible to be resubmitted.
+#     Default: None
+#   queue_name:
+#     Grid Engine job queue the job_id is associated with
+#     Default: all.q
+
 set -o errexit
 set -o nounset
 
 readonly JOB_ID=${1}
-readonly TIMEOUT_MINUTES=${2}
-readonly QUEUE_NAME=${3:-all.q}
+readonly MONITOR_INTERVAL=${2:-15}
+readonly TASK_TIMEOUT=${3:-}
+readonly QUEUE_NAME=${4:-all.q}
 
+# To detect a failed (and possibly restarted) worker node, the script will
+# SSH to the node and check the uptime.
+# For a given pass, the script will try at most CONNECT_RETRIES attempts to
+# connect to a node. Each attempt will timeout after CONNECT_TIMEOUT seconds.
 readonly CONNECT_TIMEOUT=15
 readonly CONNECT_RETRIES=5
 
 readonly JOB_NAME=$(
   qstat -j ${JOB_ID} | sed --quiet -e 's#job_name: *\(.*\)#\1#p')
 
-readonly TIMEOUT_INTERVAL=$((TIMEOUT_MINUTES * 60))
-
-echo "Begin: monitoring ${JOB_NAME}.${JOB_ID} every ${TIMEOUT_MINUTES} minutes"
+echo "Begin: monitoring ${JOB_NAME}.${JOB_ID} every ${MONITOR_INTERVAL} minutes"
 
 while :; do
    # qstat will return a list of all running tasks where the interesting
@@ -104,15 +124,23 @@ while :; do
          echo "  Now: ${NOW}, $(date '+%D %T')"
 
          RESTART_TASK=1
+       elif [[ -n ${TASK_TIMEOUT} ]] && \
+            [[ $((NOW - TASK_START_SEC)) -gt $((TASK_TIMEOUT * 60)) ]]; then
+         echo "Task ${JOB_ID}.${TASK_ID} has exceeded the task timeout"
+         echo "  Task start: ${TASK_START_SEC} sec, (${TASK_START})"
+         echo "  Now: ${NOW}, $(date '+%D %T')"
+         echo "  $(((NOW - TASK_START_SEC) / 60)) minutes > ${TASK_TIMEOUT} minutes"
+
+         RESTART_TASK=1
        fi
      fi
 
      if [[ ${RESTART_TASK} -eq 1 ]]; then
-       echo "${JOB_ID}.${TASK_ID} appears to be dead; requesting restart"
+       echo "Requesting restart of ${JOB_ID}.${TASK_ID}"
        qmod -r ${JOB_ID}.${TASK_ID}
      fi
   done
 
-  echo "Sleeping ${TIMEOUT_MINUTES} minute(s)"
-  sleep ${TIMEOUT_MINUTES}m
+  echo "Sleeping ${MONITOR_INTERVAL} minute(s)"
+  sleep ${MONITOR_INTERVAL}m
 done
