@@ -68,21 +68,24 @@ else:
     cluster_util.get_stopping_or_terminated_nodes(cluster, node_type)
 print
 
-if to_remove:
-  print "***************"
-  print "Removing nodes:"
-  print "***************"
-else:
+if not to_remove:
   print "******************"
   print "No nodes to remove"
   print "******************"
+  print
+
+  sys.exit(0)
+
+print "***************"
+print "Removing nodes:"
+print "***************"
 print
-  
+
 for node in to_remove:
   print "Removing node %s (%s)" % (node.name, node.preferred_ip)
   if not dryrun:
     cluster_util.run_elasticluster(
-      ['remove-node', '--yes', cluster_name, node.name])
+      ['remove-node', '--no-setup', '--yes', cluster_name, node.name])
 
     if not cluster_util.remove_known_hosts_entry(node, known_hosts_file):
       print "No preferred ip for node; removing file %s" % known_hosts_file
@@ -92,3 +95,4 @@ for node in to_remove:
         if e.errno != errno.ENOENT:
           raise
 
+cluster_util.run_elasticluster(['setup', cluster_name])
