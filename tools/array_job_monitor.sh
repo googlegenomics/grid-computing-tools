@@ -129,7 +129,7 @@ while :; do
          echo "Task ${JOB_ID}.${TASK_ID} has exceeded the task timeout"
          echo "  Task start: ${TASK_START_SEC} sec, (${TASK_START})"
          echo "  Now: ${NOW}, $(date '+%D %T')"
-         echo "  $(((NOW - TASK_START_SEC) / 60)) minutes > ${TASK_TIMEOUT} minutes"
+         echo "  $(((NOW - TASK_START_SEC) / 60)) minutes >= ${TASK_TIMEOUT} minutes"
 
          RESTART_TASK=1
        fi
@@ -137,7 +137,9 @@ while :; do
 
      if [[ ${RESTART_TASK} -eq 1 ]]; then
        echo "Requesting restart of ${JOB_ID}.${TASK_ID}"
-       qmod -r ${JOB_ID}.${TASK_ID}
+       while ! qmod -rj ${JOB_ID}.${TASK_ID}; do
+         sleep 10s
+       done
      fi
   done
 
