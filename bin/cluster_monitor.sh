@@ -144,6 +144,11 @@ while :; do
   remove_terminated_nodes
   check_cleanup_cluster
 
+  # Remove server keys from the known_host file for removed nodes 
+  if ! python -u ${SCRIPT_DIR}/sanitize_known_hosts.py ${CLUSTER}; then
+    echo "Continuing..."
+  fi
+
   # Add new nodes so that the cluster is at full strength
   ensure_cluster_size
   check_cleanup_cluster
