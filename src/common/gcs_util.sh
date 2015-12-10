@@ -57,14 +57,16 @@ function gcs_util::download() {
   # Track the number of bytes we download.
   # Get the number of bytes already in the destination directory
   # (and assume no one else is writing to the directory).
-  local bytes_start=$(du -s --bytes ${local_path} | cut -f 1 -d $'\t')
+  local bytes_start=$(du -s -c --bytes ${local_path} | tail -n 1 | cut -f 1 -d $'\t')
 
   # Download the file(s)
   local time_start=$(date +%s)
-  gsutil -m cp ${remote_path} ${local_path}
+  while ! gsutil -m cp ${remote_path} ${local_path}; do
+    echo "Restarting download"
+  done
   local time_end=$(date +%s)
 
-  local bytes_end=$(du -s --bytes ${local_path} | cut -f 1 -d $'\t')
+  local bytes_end=$(du -s -c --bytes ${local_path} | tail -n 1 | cut -f 1 -d $'\t')
 
   local bytes=$((bytes_end - bytes_start))
   local time=$((time_end - time_start))
@@ -94,11 +96,13 @@ function gcs_util::upload() {
   fi
 
   # Track the number of bytes we upload.
-  local bytes=$(du -s --bytes ${local_path} | cut -f 1 -d $'\t')
+  local bytes=$(du -s -c --bytes ${local_path} | tail -n 1 | cut -f 1 -d $'\t')
 
   # Do the upload
   local time_start=$(date +%s)
-  gsutil -m cp ${local_path} ${remote_path}
+  while ! gsutil -m cp ${local_path} ${remote_path}; do
+    echo "Restarting upload"
+  done
   local time_end=$(date +%s)
 
   local time=$((time_end - time_start))
