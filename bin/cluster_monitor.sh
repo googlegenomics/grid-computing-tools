@@ -54,6 +54,7 @@ readonly TMPFILE=/tmp/$(basename $0)-${CLUSTER}.log
 # Remove from the cluster any nodes marked as TERMINATED.
 # Capture output to a logfile to inspect for errors.
 function remove_terminated_nodes() {
+  date
   python -u ${SCRIPT_DIR}/remove_terminated_nodes.py ${CLUSTER} 2>&1 \
     | tee ${TMPFILE}
 }
@@ -65,6 +66,7 @@ readonly -f remove_terminated_nodes
 # as many as specified in the cluster configuration.
 # Capture output to a logfile to inspect for errors.
 function ensure_cluster_size() {
+  date
   python -u ${SCRIPT_DIR}/ensure_cluster_size.py ${CLUSTER} 2>&1 \
     | tee ${TMPFILE}
 }
@@ -79,6 +81,19 @@ function check_elasticluster_error() {
     "please re-run elasticluster setup" ${TMPFILE}
 }
 readonly check_elasticluster_error
+
+# check_elasticluster_ready
+#
+# Check the logfile for instructions from Elasticluster that the
+# cluster is ready. When remove_terminated_nodes and ensure_cluster_size
+# run, they may not end up running elasticluster setup, so the absence
+# of this message does not necessarily indicate a failure. It may be
+# that no cluster changes occurred at all.
+function check_elasticluster_ready() {
+  grep --quiet \
+    "Your cluster is ready!" ${TMPFILE}
+}
+readonly check_elasticluster_ready
 
 # check_cleanup_cluster
 #
@@ -100,6 +115,7 @@ function check_cleanup_cluster() {
     echo "Setup errors detected. Running: elasticluster setup -v ${CLUSTER}"
     echo "*****************************************************************"
 
+    date
     elasticluster setup -v ${CLUSTER} 2>&1 | tee ${TMPFILE}
 
     echo "***************************************************"
@@ -113,6 +129,10 @@ function check_cleanup_cluster() {
     error_detected=1
 
     remove_terminated_nodes
+
+    if check_elasticluster_ready; then
+      break
+    fi
   done
 }
 readonly -f check_cleanup_cluster
@@ -123,9 +143,6 @@ while :; do
   # Remove any terminated nodes
   remove_terminated_nodes
   check_cleanup_cluster
-
-  # Remove server keys from the known_host file for removed nodes 
-  python -u ${SCRIPT_DIR}/sanitize_known_hosts.py ${CLUSTER}
 
   # Add new nodes so that the cluster is at full strength
   ensure_cluster_size
