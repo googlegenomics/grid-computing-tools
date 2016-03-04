@@ -137,9 +137,12 @@ while :; do
 
      if [[ ${RESTART_TASK} -eq 1 ]]; then
        echo "Requesting restart of ${JOB_ID}.${TASK_ID}"
-       while ! qmod -rj ${JOB_ID}.${TASK_ID}; do
-         sleep 10s
-       done
+       if ! qmod -rj ${JOB_ID}.${TASK_ID}; then
+         # Sometimes qmod fails with "invalid queue or job", and the failure
+         # is persistent. Re-exec (strangely) seems to resolve it, where
+         # simply retrying does not.
+         exec $0 $*
+       fi
      fi
   done
 
