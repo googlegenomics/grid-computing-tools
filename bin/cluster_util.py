@@ -133,10 +133,10 @@ def get_desired_cluster_nodes(cluster_name):
 
   # FIXME: should not assume the template name is the same as the cluster_name
   conf = creator.cluster_conf[cluster_name]
-  for key in conf['cluster']:
+  for key in conf:
     if key.endswith('_nodes'):
       kind = key[:-len('_nodes')]
-      nodes[kind] = int(conf['cluster'][key])
+      nodes[kind] = int(conf[key])
 
   return nodes
 
