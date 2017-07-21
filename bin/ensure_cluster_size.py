@@ -21,6 +21,9 @@
 # the cluster configuration.
 
 import elasticluster
+import elasticluster.conf
+from elasticluster.__main__ import ElastiCluster
+
 import cluster_util
 
 import os
@@ -43,10 +46,10 @@ dryrun=os.environ['DRYRUN'] if 'DRYRUN' in os.environ else None
 # BEGIN MAIN
 
 # Create the elasticluster configuration endpoint
-configurator = elasticluster.get_configurator()
+creator = elasticluster.conf.make_creator(ElastiCluster.default_configuration_file)
 
 # Lookup the cluster
-cluster = configurator.load_cluster(cluster_name)
+cluster = creator.load_cluster(cluster_name)
 cluster.update()
 
 print "*********************"

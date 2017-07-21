@@ -19,6 +19,8 @@
 # Utility routines for managing an Elasticluster cluster.
 
 import elasticluster
+import elasticluster.conf
+from elasticluster.__main__ import ElastiCluster
 
 import json
 import subprocess
@@ -51,10 +53,10 @@ def get_zone_for_cluster(cluster_name):
   with the cluster. So we will pull it from the existing configuration
   (we assume the cluster configuration has not been changed)."""
 
-  configurator = elasticluster.get_configurator()
+  creator = elasticluster.conf.make_creator(ElastiCluster.default_configuration_file)
 
-  # Assume the template name is the same as the cluster_name
-  conf = configurator.cluster_conf[cluster_name]
+  # FIXME: should not assume the template name is the same as the cluster_name
+  conf = creator.cluster_conf[cluster_name]
   return conf['cloud']['zone']
 
 
@@ -127,10 +129,10 @@ def get_desired_cluster_nodes(cluster_name):
 
   nodes = {}
 
-  configurator = elasticluster.get_configurator()
+  creator = elasticluster.conf.make_creator(ElastiCluster.default_configuration_file)
 
-  # Assume the template name is the same as the cluster_name
-  conf = configurator.cluster_conf[cluster_name]
+  # FIXME: should not assume the template name is the same as the cluster_name
+  conf = creator.cluster_conf[cluster_name]
   for key in conf['cluster']:
     if key.endswith('_nodes'):
       kind = key[:-len('_nodes')]

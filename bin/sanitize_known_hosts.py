@@ -20,6 +20,9 @@
 # the known_hosts file with only those members.
 
 import elasticluster
+import elasticluster.conf
+from elasticluster.__main__ import ElastiCluster
+
 import paramiko
 
 import sys
@@ -32,10 +35,10 @@ if len(sys.argv) != 2:
 cluster_name=sys.argv[1]
 
 # Create the elasticluster configuration endpoint
-configurator = elasticluster.get_configurator()
+creator = elasticluster.conf.make_creator(ElastiCluster.default_configuration_file)
 
 # Lookup the cluster
-cluster = configurator.load_cluster(cluster_name)
+cluster = creator.load_cluster(cluster_name)
 
 # Get the list of IP addresses
 ip_addrs = [node.preferred_ip for node in cluster.get_all_nodes()]
