@@ -20,6 +20,9 @@
 # in a TERMINATED, STOPPING, or unknown state.
 
 import elasticluster
+import elasticluster.conf
+from elasticluster.__main__ import ElastiCluster
+
 import cluster_util
 
 import errno
@@ -50,10 +53,10 @@ known_hosts_file = '%s/%s' % (
   os.environ['HOME'], '.elasticluster/storage/%s.known_hosts' % cluster_name)
 
 # Create the elasticluster configuration endpoint
-configurator = elasticluster.get_configurator()
+creator = elasticluster.conf.make_creator(ElastiCluster.default_configuration_file)
 
 # Lookup the cluster
-cluster = configurator.load_cluster(cluster_name)
+cluster = creator.load_cluster(cluster_name)
 cluster.update()
 
 # Build a list of nodes to remove

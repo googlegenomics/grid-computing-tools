@@ -20,6 +20,9 @@
 # for a cluster. The "node type" can optionally be specified.
 
 import elasticluster
+import elasticluster.conf
+from elasticluster.__main__ import ElastiCluster
+
 
 import sys
 
@@ -32,10 +35,10 @@ cluster_name=sys.argv[1]
 node_type=sys.argv[2] if len(sys.argv) > 2 else None
 
 # Create the elasticluster configuration endpoint
-configurator = elasticluster.get_configurator()
+creator = elasticluster.conf.make_creator(ElastiCluster.default_configuration_file)
 
 # Lookup the cluster
-cluster = configurator.load_cluster(cluster_name)
+cluster = creator.load_cluster(cluster_name)
 
 # Emit the node names
 for node in cluster.get_all_nodes():
